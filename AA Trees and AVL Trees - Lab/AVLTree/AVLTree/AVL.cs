@@ -44,7 +44,32 @@ public class AVL<T> where T : IComparable<T>
         {
             node.Right = this.Insert(node.Right, item);
         }
+        node = Balance(node);
+        node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+        return node;
+    }
 
+    private Node<T> Balance(Node<T> node)
+    {
+        var balance = Height(node.Left) - Height(node.Right);
+        if (balance>1)
+        {
+            var childBalance = Height(node.Left.Left) - Height(node.Left.Right);
+            if (childBalance < 0)
+            {
+                node.Left = Rotateleft(node.Left);
+            }
+            return RotateRight(node);
+        }
+        else if (balance < -1)
+        {
+            var childBalance = Height(node.Right.Left) - Height(node.Right.Right);
+            if (childBalance > 0)
+            {
+                node.Right = RotateRight(node.Right);
+            }
+            return Rotateleft(node);
+        }
         return node;
     }
 
@@ -78,5 +103,33 @@ public class AVL<T> where T : IComparable<T>
         this.EachInOrder(node.Left, action);
         action(node.Value);
         this.EachInOrder(node.Right, action);
+    }
+
+    private int Height( Node<T> node)
+    {
+        if (node == null)
+        {
+            return 0;
+        }
+        return node.Height;
+    }
+
+    private  Node<T> RotateRight (Node<T> node)
+    {
+        var left = node.Left;
+        node.Left = left.Right;
+        left.Right = node;
+        node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+
+        return left;
+    }
+    private Node<T> Rotateleft(Node<T> node)
+    {
+        var right = node.Right;
+        node.Right = right.Left;
+        right.Left = node;
+        node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
+
+        return right;
     }
 }
